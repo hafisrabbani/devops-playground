@@ -11,4 +11,4 @@ services:
     networks:
       - default
     depends_on:
-      - db
+      - paygate-posportal-db
