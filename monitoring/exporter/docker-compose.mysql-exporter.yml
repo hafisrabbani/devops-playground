@@ -12,3 +12,7 @@ services:
       - monitoring
     depends_on:
       - paygate-posportal-db
+
+networks:
+  monitoring:
+    external: true
