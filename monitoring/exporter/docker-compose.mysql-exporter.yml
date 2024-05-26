@@ -9,7 +9,7 @@ services:
     ports:
       - "9104:9104"
     networks:
-      - monitoring
+      - paygate-network
     depends_on:
       - paygate-posportal-db
 
