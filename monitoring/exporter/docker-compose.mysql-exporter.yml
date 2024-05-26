@@ -9,6 +9,6 @@ services:
     ports:
       - "9104:9104"
     networks:
-      - default
+      - monitoring
     depends_on:
       - paygate-posportal-db
