@@ -14,5 +14,5 @@ services:
       - paygate-posportal-db
 
 networks:
-  monitoring:
+  paygate-network:
     external: true
