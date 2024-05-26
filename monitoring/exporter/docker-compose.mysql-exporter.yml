@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mysql-exporter:
+    image: prom/mysqld-exporter
+    container_name: mysql-exporter
+    environment:
+      - DATA_SOURCE_NAME=devopsadmin:devops1@tcp(paygate-posportal-db:3306)/
+    ports:
+      - "9104:9104"
+    networks:
+      - default
+    depends_on:
+      - db
