@@ -50,7 +50,7 @@ Y
 EOF
 
 
-echo "Info : MySQL root password : $MYSQL_ROOT_PASSWORD"
+echo "Info : MySQL root password : $MARIADB_ROOT_PASSWORD"
 echo "MySQL installation and initial setup complete."
 echo "MySQL root password has been set."
 echo "All done!"
