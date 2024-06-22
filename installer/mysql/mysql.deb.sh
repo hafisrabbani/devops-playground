@@ -6,41 +6,49 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-
-read -sp "Enter the MySQL root password: " MYSQL_ROOT_PASSWORD
+# Minta input password root MariaDB dari pengguna
+read -sp "Enter the MariaDB root password: " MARIADB_ROOT_PASSWORD
 echo
-read -sp "Confirm the MySQL root password: " MYSQL_ROOT_PASSWORD_CONFIRM
+read -sp "Confirm the MariaDB root password: " MARIADB_ROOT_PASSWORD_CONFIRM
 echo
 
-if [ "$MYSQL_ROOT_PASSWORD" != "$MYSQL_ROOT_PASSWORD_CONFIRM" ]; then
+# Pastikan password yang dikonfirmasi cocok
+if [ "$MARIADB_ROOT_PASSWORD" != "$MARIADB_ROOT_PASSWORD_CONFIRM" ]; then
   echo "Passwords do not match. Please run the script again."
   exit 1
 fi
 
+# Update daftar paket
 echo "Updating package list..."
 apt-get update -y
 
+# Instal MariaDB Server
+echo "Installing MariaDB Server..."
+apt-get install mariadb-server -y
 
-echo "Installing MySQL Server..."
-apt-get install mysql-server -y
+# Memulai layanan MariaDB
+echo "Starting MariaDB service..."
+systemctl start mariadb
 
-echo "Starting MySQL service..."
-systemctl start mysql
+# Mengaktifkan layanan MariaDB untuk memulai secara otomatis saat boot
+echo "Enabling MariaDB to start on boot..."
+systemctl enable mariadb
 
-echo "Enabling MySQL to start on boot..."
-systemctl enable mysql
-echo "Securing MySQL installation..."
+# Mengamankan instalasi MariaDB
+echo "Securing MariaDB installation..."
 
+# Jalankan mysql_secure_installation tanpa prompt
 mysql_secure_installation <<EOF
 
 Y
-$MYSQL_ROOT_PASSWORD
-$MYSQL_ROOT_PASSWORD
+$MARIADB_ROOT_PASSWORD
+$MARIADB_ROOT_PASSWORD
 Y
 Y
 Y
 Y
 EOF
+
 
 echo "Info : MySQL root password : $MYSQL_ROOT_PASSWORD"
 echo "MySQL installation and initial setup complete."
