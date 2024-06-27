@@ -42,6 +42,13 @@ user=$MARIADB_EXPORTER_USERNAME
 password=$MARIADB_EXPORTER_PASSWORD
 EOF
 
+# Menambah permission file konfigurasi
+chmod 600 /etc/.mysqld_exporter.cnf
+
+# Membuat pengguna khusus untuk menjalankan mysqld_exporter
+echo "Creating a dedicated user for MySQL Exporter..."
+useradd -rs /bin/false mysqld_exporter
+
 # Membuat file service untuk mysqld_exporter
 echo "Creating MySQL Exporter service file..."
 cat <<EOF > /etc/systemd/system/mysql-exporter.service
@@ -50,7 +57,7 @@ Description=Prometheus MySQL Exporter
 After=network.target
 
 [Service]
-User=nobody
+User=mysqld_exporter
 Group=nogroup
 Type=simple
 ExecStart=/usr/local/bin/mysqld_exporter \
