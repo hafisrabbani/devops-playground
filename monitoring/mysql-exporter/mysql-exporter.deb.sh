@@ -28,10 +28,10 @@ echo "Downloading MySQL Exporter..."
 wget https://github.com/prometheus/mysqld_exporter/archive/refs/tags/$LATEST_RELEASE.tar.gz
 
 echo "Extracting MySQL Exporter..."
-tar -xvf mysqld_exporter-$LATEST_RELEASE.linux-amd64.tar.gz
+tar -xvf mysqld_exporter-$LATEST_RELEASE.tar.gz
 
 echo "Moving MySQL Exporter..."
-mv mysqld_exporter-$LATEST_RELEASE.linux-amd64/mysqld_exporter /usr/local/bin
+mv mysqld_exporter-$LATEST_RELEASE/mysqld_exporter /usr/local/bin
 
 # Membuat file konfigurasi untuk mysqld_exporter
 echo "Creating configuration file for MySQL Exporter..."
