@@ -25,7 +25,7 @@ LATEST_RELEASE=$(curl -s https://api.github.com/repos/prometheus/mysqld_exporter
 
 # Mengunduh dan menginstal mysqld_exporter
 echo "Downloading MySQL Exporter..."
-wget https://github.com/prometheus/mysqld_exporter/releases/download/$LATEST_RELEASE/mysqld_exporter-$LATEST_RELEASE.linux-amd64.tar.gz
+wget https://github.com/prometheus/mysqld_exporter/releases/download/$LATEST_RELEASE/mysqld_exporter-$LATEST_RELEASE.tar.gz
 
 echo "Extracting MySQL Exporter..."
 tar -xvf mysqld_exporter-$LATEST_RELEASE.linux-amd64.tar.gz
