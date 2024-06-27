@@ -7,9 +7,9 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Meminta input dari pengguna
-read -sp "Enter the MariaDB/MySQL Username For Exporter: " MARIADB_EXPORTER_USERNAME
+read -p "Enter the MariaDB/MySQL Username For Exporter: " MARIADB_EXPORTER_USERNAME
 echo
-read -sp "Enter the MariaDB/MySQL Password For Exporter: " MARIADB_EXPORTER_PASSWORD
+read -p "Enter the MariaDB/MySQL Password For Exporter: " MARIADB_EXPORTER_PASSWORD
 echo
 
 # Memeriksa apakah wget sudah diinstal
@@ -25,7 +25,7 @@ LATEST_RELEASE=$(curl -s https://api.github.com/repos/prometheus/mysqld_exporter
 
 # Mengunduh dan menginstal mysqld_exporter
 echo "Downloading MySQL Exporter..."
-wget https://github.com/prometheus/mysqld_exporter/releases/download/$LATEST_RELEASE/mysqld_exporter-$LATEST_RELEASE.tar.gz
+wget https://github.com/prometheus/mysqld_exporter/archive/refs/tags/$LATEST_RELEASE.tar.gz
 
 echo "Extracting MySQL Exporter..."
 tar -xvf mysqld_exporter-$LATEST_RELEASE.linux-amd64.tar.gz
