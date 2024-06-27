@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Pastikan skrip dijalankan sebagai root
 if [ "$EUID" -ne 0 ]; then
@@ -9,7 +9,7 @@ fi
 # Meminta input dari pengguna
 read -p "Enter the MariaDB/MySQL Username For Exporter: " MARIADB_EXPORTER_USERNAME
 echo
-read -p "Enter the MariaDB/MySQL Password For Exporter: " MARIADB_EXPORTER_PASSWORD
+read -s -p "Enter the MariaDB/MySQL Password For Exporter: " MARIADB_EXPORTER_PASSWORD
 echo
 
 # Memeriksa apakah wget sudah diinstal
@@ -20,61 +20,50 @@ if ! [ -x "$(command -v wget)" ]; then
   apt-get install wget -y
 fi
 
-# Mendapatkan versi terbaru mysqld_exporter
-LATEST_RELEASE=$(curl -s https://api.github.com/repos/prometheus/mysqld_exporter/releases/latest | grep tag_name | cut -d '"' -f 4)
+echo "Downloading mysqld_exporter..."
+wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.15.1/mysqld_exporter-0.15.1.linux-amd64.tar.gz
 
-# Mengunduh dan menginstal mysqld_exporter
-echo "Downloading MySQL Exporter..."
-wget https://github.com/prometheus/mysqld_exporter/archive/refs/tags/$LATEST_RELEASE.tar.gz
+echo "Extracting mysqld_exporter..."
+tar xvfz mysqld_exporter-0.15.1.linux-amd64.tar.gz
 
-echo "Extracting MySQL Exporter..."
-tar -xvf $LATEST_RELEASE.tar.gz
+echo "Moving mysqld_exporter to /usr/local/bin..."
+mv mysqld_exporter-0.15.1.linux-amd64/mysqld_exporter /usr/local/bin
 
-echo "Moving MySQL Exporter..."
-LATEST_RELEASE=$(echo $LATEST_RELEASE | cut -d 'v' -f 2)
-mv mysqld_exporter-$LATEST_RELEASE /usr/local/bin
-
-# Membuat file konfigurasi untuk mysqld_exporter
-echo "Creating configuration file for MySQL Exporter..."
-cat <<EOF > /etc/.mysqld_exporter.cnf
-[client]
-user=$MARIADB_EXPORTER_USERNAME
-password=$MARIADB_EXPORTER_PASSWORD
-EOF
-
-# Menambah permission file konfigurasi
-chmod 600 /etc/.mysqld_exporter.cnf
-
-# Membuat pengguna khusus untuk menjalankan mysqld_exporter
-echo "Creating a dedicated user for MySQL Exporter..."
+echo "Creating mysqld_exporter user..."
 useradd -rs /bin/false mysqld_exporter
 
-# Membuat file service untuk mysqld_exporter
-echo "Creating MySQL Exporter service file..."
-cat <<EOF > /etc/systemd/system/mysql-exporter.service
-[Unit]
-Description=Prometheus MySQL Exporter
-After=network.target
+echo "Create .my.cnf file..."
+echo "[client]" > /home/mysqld_exporter/.my.cnf
+echo "user=$MARIADB_EXPORTER_USERNAME" >> /home/mysqld_exporter/.my.cnf
+echo "password=$MARIADB_EXPORTER_PASSWORD" >> /home/mysqld_exporter/.my.cnf
 
-[Service]
-User=mysqld_exporter
-Group=nogroup
-Type=simple
-ExecStart=/usr/local/bin/mysqld_exporter \
-  --config.my-cnf="/etc/.mysqld_exporter.cnf"
+echo "Setting permissions for .my.cnf..."
+chown mysqld_exporter:mysqld_exporter /home/mysqld_exporter/.my.cnf
+chmod 600 /home/mysqld_exporter/.my.cnf
 
-[Install]
-WantedBy=multi-user.target
-EOF
+echo "Creating systemd service file..."
+echo "[Unit]" > /etc/systemd/system/mysqld_exporter.service
+echo "Description=Prometheus MySQL Exporter" >> /etc/systemd/system/mysqld_exporter.service
+echo "After=network.target" >> /etc/systemd/system/mysqld_exporter.service
+echo "" >> /etc/systemd/system/mysqld_exporter.service
+echo "[Service]" >> /etc/systemd/system/mysqld_exporter.service
+echo "User=mysqld_exporter" >> /etc/systemd/system/mysqld_exporter.service
+echo "ExecStart=/usr/local/bin/mysqld_exporter" >> /etc/systemd/system/mysqld_exporter.service
+echo "" >> /etc/systemd/system/mysqld_exporter.service
+echo "[Install]" >> /etc/systemd/system/mysqld_exporter.service
+echo "WantedBy=default.target" >> /etc/systemd/system/mysqld_exporter.service
 
-# Reload systemd dan mulai mysqld_exporter
-echo "Reloading systemd daemon..."
+echo "Reloading systemd service..."
 systemctl daemon-reload
 
-echo "Starting MySQL Exporter service..."
-systemctl start mysql-exporter
+echo "Starting mysqld_exporter service..."
+systemctl start mysqld_exporter
 
-echo "Enabling MySQL Exporter service on boot..."
-systemctl enable mysql-exporter
+echo "Enabling mysqld_exporter service to start on boot..."
+systemctl enable mysqld_exporter
 
-echo "MySQL Exporter installation and setup is complete."
+echo "Checking mysqld_exporter service status..."
+systemctl status mysqld_exporter
+
+echo "MySQL Exporter installation and initial setup complete."
+echo "All done!"
