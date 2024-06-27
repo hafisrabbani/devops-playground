@@ -31,6 +31,7 @@ echo "Extracting MySQL Exporter..."
 tar -xvf $LATEST_RELEASE.tar.gz
 
 echo "Moving MySQL Exporter..."
+LATEST_RELEASE=$(echo $LATEST_RELEASE | cut -d 'v' -f 2)
 mv mysqld_exporter-$LATEST_RELEASE /usr/local/bin
 
 # Membuat file konfigurasi untuk mysqld_exporter
